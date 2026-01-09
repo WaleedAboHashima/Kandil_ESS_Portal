@@ -1,14 +1,10 @@
 import * as React from "react"
 import {
   IconCalendarEvent,
-  IconCamera,
   IconCash,
-  IconUser,
   IconDashboard,
   IconDatabase,
   IconDoorExit,
-  IconFileAi,
-  IconFileDescription,
   IconFileWord,
   IconHelp,
   IconReport,

@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChartPieLeaveBreakdown } from "@/components/chart-pie-leave-breakdown"
 import { ChartBarLeaveTypes } from "@/components/chart-bar-leave-types"
-import { IconCalendarEvent, IconPlus, IconChevronLeft, IconChevronRight, IconFileDownload } from "@tabler/icons-react"
+import { IconPlus, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 import { useState } from "react"
 
 const monthlyData = {

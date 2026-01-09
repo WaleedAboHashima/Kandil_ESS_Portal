@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, useMatchRoute } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
-import { Button } from "./ui/button"
 
 export function NavMain({
   items,

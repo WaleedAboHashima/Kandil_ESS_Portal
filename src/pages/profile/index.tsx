@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { IconUser, IconMail, IconPhone, IconMapPin, IconBuilding, IconCalendar, IconEdit, IconCamera } from "@tabler/icons-react"
+import { IconEdit, IconCamera } from "@tabler/icons-react"
 
 const profileData = {
     personalInfo: {
