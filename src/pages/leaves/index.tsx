@@ -2,11 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChartPieLeaveBreakdown } from "@/components/chart-pie-leave-breakdown"
-import { ChartBarLeaveTypes } from "@/components/chart-bar-leave-types"
-import { IconPlus, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
-import { useState } from "react"
+import { IconPlus } from "@tabler/icons-react"
 
 const monthlyData = {
     month: "December 2024",
@@ -81,8 +77,6 @@ const leaveHistory = [
 ]
 
 export default function Leaves() {
-    const [selectedMonth, setSelectedMonth] = useState("2024-12")
-
     const getStatusBadge = (status: string) => {
         switch (status) {
             case "Approved":
@@ -123,7 +117,7 @@ export default function Leaves() {
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @3xl/main:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-4">
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardDescription>Annual Leave</CardDescription>
@@ -165,36 +159,11 @@ export default function Leaves() {
                         </Card>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @3xl/main:grid-cols-2">
-                        <ChartPieLeaveBreakdown />
-                        <ChartBarLeaveTypes />
-                    </div>
-
                     <div className="px-4 lg:px-6">
                         <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                                <div>
-                                    <CardTitle>Leave History</CardTitle>
-                                    <CardDescription>Your leave requests and approvals</CardDescription>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button variant="outline" size="icon">
-                                        <IconChevronLeft className="size-4" />
-                                    </Button>
-                                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="2024-12">December 2024</SelectItem>
-                                            <SelectItem value="2024-11">November 2024</SelectItem>
-                                            <SelectItem value="2024-10">October 2024</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Button variant="outline" size="icon">
-                                        <IconChevronRight className="size-4" />
-                                    </Button>
-                                </div>
+                            <CardHeader>
+                                <CardTitle>Leave History</CardTitle>
+                                <CardDescription>Your leave requests and approvals</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="overflow-auto rounded-lg border">
@@ -202,30 +171,18 @@ export default function Leaves() {
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>Type</TableHead>
-                                                <TableHead>Start Date</TableHead>
-                                                <TableHead>End Date</TableHead>
+                                                <TableHead>From - To</TableHead>
                                                 <TableHead>Days</TableHead>
                                                 <TableHead>Status</TableHead>
-                                                <TableHead>Applied On</TableHead>
-                                                <TableHead>Approved By</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {leaveHistory.map((leave) => (
                                                 <TableRow key={leave.id}>
                                                     <TableCell className="font-medium">{leave.type}</TableCell>
-                                                    <TableCell>{leave.startDate}</TableCell>
-                                                    <TableCell>{leave.endDate}</TableCell>
+                                                    <TableCell>{leave.startDate} - {leave.endDate}</TableCell>
                                                     <TableCell>{leave.days} {leave.days === 1 ? "day" : "days"}</TableCell>
                                                     <TableCell>{getStatusBadge(leave.status)}</TableCell>
-                                                    <TableCell>{leave.appliedOn}</TableCell>
-                                                    <TableCell>{leave.approvedBy}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        <Button variant="ghost" size="sm">
-                                                            View
-                                                        </Button>
-                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

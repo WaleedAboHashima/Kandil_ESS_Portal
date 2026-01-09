@@ -1,9 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IconCalendarCheck, IconCalendarX, IconClock, IconClockHour9, IconClockHour5, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
+import { IconCalendarCheck, IconCalendarX, IconClock, IconClockHour9, IconClockHour5 } from "@tabler/icons-react"
 import { useState } from "react"
 
 const monthlyData = {
@@ -69,27 +68,19 @@ export default function Attendance() {
                             <h1 className="text-2xl font-bold tracking-tight">Attendance</h1>
                             <p className="text-muted-foreground">Track your attendance and working hours</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="icon">
-                                <IconChevronLeft className="size-4" />
-                            </Button>
-                            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="2025-12">December 2025</SelectItem>
-                                    <SelectItem value="2025-11">November 2025</SelectItem>
-                                    <SelectItem value="2025-10">October 2025</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button variant="outline" size="icon">
-                                <IconChevronRight className="size-4" />
-                            </Button>
-                        </div>
+                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="2025-12">December 2025</SelectItem>
+                                <SelectItem value="2025-11">November 2025</SelectItem>
+                                <SelectItem value="2025-10">October 2025</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @3xl/main:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-3">
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardDescription>Present Days</CardDescription>
@@ -129,18 +120,6 @@ export default function Attendance() {
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardDescription>Overtime</CardDescription>
-                                <CardTitle className="text-3xl font-bold">{monthlyData.overtimeHours}h</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <IconClock className="size-4 text-amber-600" />
-                                    <span>2 days</span>
-                                </div>
-                            </CardContent>
-                        </Card>
                     </div>
 
                     <div className="px-4 lg:px-6">

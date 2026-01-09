@@ -1,9 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Separator } from "@/components/ui/separator"
-import { IconFileDownload, IconEye, IconCurrencyDollar } from "@tabler/icons-react"
+import { IconCurrencyDollar } from "@tabler/icons-react"
 
 const currentPayslip = {
     month: "December 2025",
@@ -112,109 +110,6 @@ export default function Payslips() {
                         </Card>
                     </div>
 
-                    <div className="px-4 lg:px-6">
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <CardTitle>Current Payslip - {currentPayslip.month}</CardTitle>
-                                        <CardDescription>Detailed salary breakdown</CardDescription>
-                                    </div>
-                                    <Button className="gap-2">
-                                        <IconFileDownload className="size-4" />
-                                        Download PDF
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <div className="text-muted-foreground">Employee ID</div>
-                                        <div className="font-medium">{currentPayslip.employeeId}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-muted-foreground">Employee Name</div>
-                                        <div className="font-medium">{currentPayslip.employeeName}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-muted-foreground">Designation</div>
-                                        <div className="font-medium">{currentPayslip.designation}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-muted-foreground">Department</div>
-                                        <div className="font-medium">{currentPayslip.department}</div>
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <div className="grid grid-cols-1 gap-6 @3xl/main:grid-cols-2">
-                                    <div>
-                                        <h3 className="font-semibold mb-4">Earnings</h3>
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Basic Salary</span>
-                                                <span className="font-medium">EGP {currentPayslip.basicSalary.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">House Rent Allowance (HRA)</span>
-                                                <span className="font-medium">EGP {currentPayslip.hra.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Transportation</span>
-                                                <span className="font-medium">EGP {currentPayslip.transportation.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Medical Allowance</span>
-                                                <span className="font-medium">EGP {currentPayslip.medical.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Performance Bonus</span>
-                                                <span className="font-medium">EGP {currentPayslip.bonus.toLocaleString()}</span>
-                                            </div>
-                                            <Separator />
-                                            <div className="flex justify-between font-semibold text-green-600">
-                                                <span>Total Earnings</span>
-                                                <span>EGP {totalEarnings.toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h3 className="font-semibold mb-4">Deductions</h3>
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Income Tax</span>
-                                                <span className="font-medium">EGP {currentPayslip.tax.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Health Insurance</span>
-                                                <span className="font-medium">EGP {currentPayslip.insurance.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Provident Fund (PF)</span>
-                                                <span className="font-medium">EGP {currentPayslip.providentFund.toLocaleString()}</span>
-                                            </div>
-                                            <Separator />
-                                            <div className="flex justify-between font-semibold text-red-600">
-                                                <span>Total Deductions</span>
-                                                <span>EGP {totalDeductions.toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <div className="rounded-lg bg-muted p-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-lg font-semibold">Net Salary</span>
-                                        <span className="text-2xl font-bold text-primary">EGP {netSalary.toLocaleString()}</span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
 
                     <div className="px-4 lg:px-6">
                         <Card>
@@ -231,7 +126,6 @@ export default function Payslips() {
                                                 <TableHead>Net Salary</TableHead>
                                                 <TableHead>Status</TableHead>
                                                 <TableHead>Payment Date</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -241,16 +135,6 @@ export default function Payslips() {
                                                     <TableCell>EGP {payslip.netSalary.toLocaleString()}</TableCell>
                                                     <TableCell>{getStatusBadge(payslip.status)}</TableCell>
                                                     <TableCell>{payslip.date}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        <div className="flex justify-end gap-2">
-                                                            <Button variant="ghost" size="sm">
-                                                                <IconEye className="size-4" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="sm">
-                                                                <IconFileDownload className="size-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
