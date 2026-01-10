@@ -1,4 +1,4 @@
-import { cn, cookies } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -10,8 +10,6 @@ import { useState } from "react"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group"
 import { Eye, EyeOff } from "lucide-react"
 import { useLoginMutation } from "@/queries/auth"
-import { ToastSuccess } from "./Toast"
-import { useRouter } from "@tanstack/react-router"
 
 export function LoginForm({
   className,
@@ -21,7 +19,6 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const loginMutation = useLoginMutation();
-  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -29,13 +26,10 @@ export function LoginForm({
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    cookies.set("token", "test");
-    ToastSuccess(`Welcome Back Eng. Hossam`);
-    router.navigate({ to: "/", replace: true });
-    // loginMutation.mutate({
-    //   login: email,
-    //   password: password,
-    // });
+    loginMutation.mutate({
+      login: email,
+      password: password,
+    });
   }
 
   return (
