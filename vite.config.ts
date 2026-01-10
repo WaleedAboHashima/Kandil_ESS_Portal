@@ -20,10 +20,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/custom': {
         target: 'https://kandil-glass-stage-26832699.dev.odoo.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/custom/, ''),
         secure: false,
       }
     }
