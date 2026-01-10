@@ -22,6 +22,23 @@ export function LeaveRequestsTable() {
     const { data: userLeavesData, isLoading } = useUserLeaves();
     const deleteLeave = useDeleteLeave();
 
+    // Safe date formatting helper
+    const safeFormatDate = (dateString: string, formatStr: string = "MMM d, yyyy"): string => {
+        try {
+            if (!dateString || typeof dateString !== 'string') {
+                return "Invalid date";
+            }
+            const parsed = parseISO(dateString);
+            if (isNaN(parsed.getTime())) {
+                return "Invalid date";
+            }
+            return format(parsed, formatStr);
+        } catch (error) {
+            console.error('Error formatting date:', dateString, error);
+            return "Invalid date";
+        }
+    };
+
     const getStatusBadge = (status: string) => {
         switch (status.toLowerCase()) {
             case "approved":
@@ -57,14 +74,28 @@ export function LeaveRequestsTable() {
         deleteLeave.mutate({ leave_id: leaveId });
     };
 
-    // Flatten all leave requests from all categories
+    // Flatten all leave requests from all categories with defensive validation
     const allLeaveRequests: LeaveRequest[] = [];
-    if (userLeavesData) {
-        Object.values(userLeavesData).forEach((categories) => {
-            categories.forEach((category) => {
-                allLeaveRequests.push(...category.data);
+    if (userLeavesData && typeof userLeavesData === 'object') {
+        try {
+            Object.values(userLeavesData).forEach((categories) => {
+                // Ensure categories is an array
+                if (Array.isArray(categories)) {
+                    categories.forEach((category) => {
+                        // Ensure category is an object with a data property that is an array
+                        if (category && typeof category === 'object' && 'data' in category && Array.isArray(category.data)) {
+                            allLeaveRequests.push(...category.data);
+                        } else {
+                            console.warn('Invalid category structure:', category);
+                        }
+                    });
+                } else {
+                    console.warn('Invalid categories structure (not an array):', categories);
+                }
             });
-        });
+        } catch (error) {
+            console.error('Error flattening leave requests:', error);
+        }
     }
 
     if (isLoading) {
@@ -122,15 +153,15 @@ export function LeaveRequestsTable() {
                                                         <>
                                                             <IconClock className="size-4 text-muted-foreground" />
                                                             <span className="text-sm">
-                                                                {format(parseISO(request.date_from), "MMM d, yyyy")}
+                                                                {safeFormatDate(request.date_from, "MMM d, yyyy")}
                                                             </span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <IconCalendar className="size-4 text-muted-foreground" />
                                                             <span className="text-sm">
-                                                                {format(parseISO(request.date_from), "MMM d")} -{" "}
-                                                                {format(parseISO(request.date_to), "MMM d, yyyy")}
+                                                                {safeFormatDate(request.date_from, "MMM d")} -{" "}
+                                                                {safeFormatDate(request.date_to, "MMM d, yyyy")}
                                                             </span>
                                                         </>
                                                     )}

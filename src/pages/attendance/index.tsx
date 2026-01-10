@@ -53,8 +53,8 @@ export default function Attendance() {
         const allDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
         const workingDays = allDays.filter((day) => !isWeekend(day) && !isFuture(day)).length
 
-        // Calculate absent days
-        const absentDays = workingDays - presentDays + 1
+        // Calculate absent days (fixed off-by-one error)
+        const absentDays = workingDays - presentDays
 
         return {
             month: format(monthStart, "MMMM yyyy"),
@@ -83,9 +83,27 @@ export default function Attendance() {
             const checkInDate = parseISO(record.check_in)
             if (checkInDate >= monthStart && checkInDate <= monthEnd) {
                 const dateKey = format(checkInDate, "yyyy-MM-dd")
-                // If multiple records for same day, keep the one with more hours or latest
-                if (!recordsByDate.has(dateKey)) {
+                // If multiple records for same day, keep the one with more hours or the latest
+                const existing = recordsByDate.get(dateKey)
+                if (!existing) {
                     recordsByDate.set(dateKey, record)
+                } else {
+                    // Calculate hours for both records
+                    const getHours = (rec: typeof record) => {
+                        if (rec.check_in && rec.check_out && rec.check_out.trim() !== "") {
+                            const checkIn = parseISO(rec.check_in)
+                            const checkOut = parseISO(rec.check_out)
+                            return differenceInMinutes(checkOut, checkIn)
+                        }
+                        return 0
+                    }
+                    const existingHours = getHours(existing)
+                    const currentHours = getHours(record)
+
+                    // Keep the record with more hours, or if equal, keep the latest by attendance_id
+                    if (currentHours > existingHours || (currentHours === existingHours && record.attendance_id > existing.attendance_id)) {
+                        recordsByDate.set(dateKey, record)
+                    }
                 }
             }
         })

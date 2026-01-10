@@ -21,6 +21,7 @@ export function RequestLeaveDialog() {
     const [hourFrom, setHourFrom] = useState("");
     const [hourTo, setHourTo] = useState("");
     const [description, setDescription] = useState("");
+    const [validationError, setValidationError] = useState<string>("");
 
     const { data: leaveTypesData } = useLeaveTypes();
     const { data: userLeavesData } = useUserLeaves();
@@ -61,10 +62,45 @@ export function RequestLeaveDialog() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setValidationError("");
 
-        if (!selectedLeaveType || !dateFrom) return;
+        // Validate required fields
+        if (!selectedLeaveType) {
+            setValidationError("Please select a leave type");
+            return;
+        }
+
+        if (!dateFrom) {
+            setValidationError("Please select a start date");
+            return;
+        }
 
         const isHourBased = selectedLeaveType.request_unit.toLowerCase() === "hour";
+
+        // Additional validation for day-based leaves
+        if (!isHourBased && !dateTo) {
+            setValidationError("Please select an end date for day-based leave");
+            return;
+        }
+
+        // Validate hour-based fields
+        if (isHourBased) {
+            if (!hourFrom || !hourTo) {
+                setValidationError("Please enter both from and to hours");
+                return;
+            }
+            const fromNum = parseFloat(hourFrom);
+            const toNum = parseFloat(hourTo);
+            if (isNaN(fromNum) || isNaN(toNum) || fromNum >= toNum) {
+                setValidationError("Invalid hours: 'from' must be less than 'to'");
+                return;
+            }
+        }
+
+        if (!description.trim()) {
+            setValidationError("Please provide a description");
+            return;
+        }
 
         const leaveData = {
             leave_type_id: selectedLeaveType.leave_type_id,
@@ -83,6 +119,7 @@ export function RequestLeaveDialog() {
                 setHourFrom("");
                 setHourTo("");
                 setDescription("");
+                setValidationError("");
                 setOpen(false);
             },
         });
@@ -104,6 +141,11 @@ export function RequestLeaveDialog() {
                     <DialogDescription>Submit a new leave request. Fill in all required fields.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    {validationError && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md text-sm">
+                            {validationError}
+                        </div>
+                    )}
                     <div className="space-y-2">
                         <Label htmlFor="leave-type">Leave Type *</Label>
                         <Select
