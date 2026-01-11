@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,16 @@ import { format, parseISO, eachDayOfInterval } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { LeaveType } from "@/types/leaves";
 
-export function RequestLeaveDialog() {
-    const [open, setOpen] = useState(false);
+interface RequestLeaveDialogProps {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    preselectedDate?: Date;
+}
+
+export function RequestLeaveDialog({ open: controlledOpen, onOpenChange, preselectedDate }: RequestLeaveDialogProps = {}) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const setOpen = onOpenChange || setInternalOpen;
     const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveType | null>(null);
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
@@ -26,6 +34,14 @@ export function RequestLeaveDialog() {
     const { data: leaveTypesData } = useLeaveTypes();
     const { data: userLeavesData } = useUserLeaves();
     const createLeave = useCreateLeave();
+
+    // Set preselected date when dialog opens
+    useEffect(() => {
+        if (preselectedDate && open) {
+            setDateFrom(preselectedDate);
+            setDateTo(preselectedDate);
+        }
+    }, [preselectedDate, open]);
 
     // Get all dates that have existing leave requests
     const bookedDates = useMemo(() => {
@@ -129,12 +145,14 @@ export function RequestLeaveDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button>
-                    <IconPlus className="size-4" />
-                    Request Leave
-                </Button>
-            </DialogTrigger>
+            {!preselectedDate && (
+                <DialogTrigger asChild>
+                    <Button>
+                        <IconPlus className="size-4" />
+                        Request Leave
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Request Time Off</DialogTitle>
