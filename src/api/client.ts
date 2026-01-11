@@ -2,9 +2,7 @@ import axios from "axios";
 import { cookies } from "@/lib/utils";
 
 export const api = axios.create({
-  baseURL: import.meta.env.DEV
-    ? "/custom"
-    : "https://kandil-glass-stage-26832699.dev.odoo.com",
+  baseURL: import.meta.env.DEV ? "/custom" : "",
   headers: {
     "Content-Type": "application/json",
   },
