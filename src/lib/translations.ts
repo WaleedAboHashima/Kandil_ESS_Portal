@@ -16,6 +16,7 @@ export const leaveTypeTranslations: Record<string, string> = {
   "Absent Days": "أيام غياب",
   "Total Hours": "إجمالي ساعات",
   "Extra Hours": "ساعات إضافية",
+  "Planned Leave": "اجازه مخطط لها",
 };
 
 export function translateLeaveType(englishName: string): string {
