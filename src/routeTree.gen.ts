@@ -13,6 +13,7 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
+import { Route as AuthenticatedRecruitmentRouteImport } from './routes/_authenticated/recruitment'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPayslipsRouteImport } from './routes/_authenticated/payslips'
 import { Route as AuthenticatedLeavesRouteImport } from './routes/_authenticated/leaves'
@@ -36,6 +37,12 @@ const PublicLoginRoute = PublicLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => PublicRoute,
 } as any)
+const AuthenticatedRecruitmentRoute =
+  AuthenticatedRecruitmentRouteImport.update({
+    id: '/recruitment',
+    path: '/recruitment',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/recruitment': typeof AuthenticatedRecruitmentRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -70,6 +78,7 @@ export interface FileRoutesByTo {
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/recruitment': typeof AuthenticatedRecruitmentRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -81,6 +90,7 @@ export interface FileRoutesById {
   '/_authenticated/leaves': typeof AuthenticatedLeavesRoute
   '/_authenticated/payslips': typeof AuthenticatedPayslipsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/recruitment': typeof AuthenticatedRecruitmentRoute
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
@@ -91,10 +101,18 @@ export interface FileRouteTypes {
     | '/leaves'
     | '/payslips'
     | '/profile'
+    | '/recruitment'
     | '/login'
     | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/attendance' | '/leaves' | '/payslips' | '/profile' | '/login' | '/'
+  to:
+    | '/attendance'
+    | '/leaves'
+    | '/payslips'
+    | '/profile'
+    | '/recruitment'
+    | '/login'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
@@ -103,6 +121,7 @@ export interface FileRouteTypes {
     | '/_authenticated/leaves'
     | '/_authenticated/payslips'
     | '/_authenticated/profile'
+    | '/_authenticated/recruitment'
     | '/_public/login'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -142,6 +161,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_authenticated/recruitment': {
+      id: '/_authenticated/recruitment'
+      path: '/recruitment'
+      fullPath: '/recruitment'
+      preLoaderRoute: typeof AuthenticatedRecruitmentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -178,6 +204,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLeavesRoute: typeof AuthenticatedLeavesRoute
   AuthenticatedPayslipsRoute: typeof AuthenticatedPayslipsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRecruitmentRoute: typeof AuthenticatedRecruitmentRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -186,6 +213,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLeavesRoute: AuthenticatedLeavesRoute,
   AuthenticatedPayslipsRoute: AuthenticatedPayslipsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRecruitmentRoute: AuthenticatedRecruitmentRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

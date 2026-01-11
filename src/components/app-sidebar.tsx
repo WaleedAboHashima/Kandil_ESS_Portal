@@ -1,13 +1,14 @@
-import * as React from "react"
+import * as React from "react";
 import {
   IconCalendarEvent,
   IconCash,
   IconDashboard,
   IconDoorExit,
-} from "@tabler/icons-react"
+  IconUsers,
+} from "@tabler/icons-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -16,9 +17,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import logo from "@/assets/images/logo-sm.png"
-
+} from "@/components/ui/sidebar";
+import logo from "@/assets/images/logo-sm.png";
 
 const data = {
   navMain: [
@@ -38,12 +38,17 @@ const data = {
       icon: IconDoorExit,
     },
     {
+      title: "Recruitment",
+      url: "/recruitment",
+      icon: IconUsers,
+    },
+    {
       title: "Payslips",
       url: "/payslips",
       icon: IconCash,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -51,9 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
+            <SidebarMenuButton className="data-[slot=sidebar-menu-button]:p-1.5!">
               <img src={logo} alt="Logo" width={30} height={30} />
               <span className="text-base font-medium">Kandil ESS.</span>
             </SidebarMenuButton>
@@ -67,5 +70,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
