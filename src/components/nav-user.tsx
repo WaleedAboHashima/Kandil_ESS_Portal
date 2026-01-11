@@ -1,13 +1,6 @@
-import {
-  IconDotsVertical,
-  IconLogout,
-} from "@tabler/icons-react"
+import { IconDotsVertical, IconLogout } from "@tabler/icons-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,20 +8,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useNavigate } from "@tanstack/react-router"
-import { cookies } from "@/lib/utils"
-import type { User } from "@/types/auth"
+} from "@/components/ui/sidebar";
+import { useNavigate } from "@tanstack/react-router";
+import { cookies } from "@/lib/utils";
+import type { User } from "@/types/auth";
 
 export function NavUser() {
-  const { isMobile } = useSidebar()
-  const navigate = useNavigate()
+  const { isMobile } = useSidebar();
+  const navigate = useNavigate();
 
   // Safely parse user from localStorage
   let user: User | null = null;
@@ -52,7 +45,7 @@ export function NavUser() {
     cookies.remove("token");
     localStorage.removeItem("user");
     navigate({ to: "/login" });
-  }
+  };
 
   // Safe function to get user initials
   const getUserInitials = (name: string | undefined): string => {
@@ -75,10 +68,14 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.img_link} alt={user.employee_name} />
-                <AvatarFallback className="rounded-lg">{getUserInitials(user.employee_name)}</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {getUserInitials(user.employee_name)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.employee_name}</span>
+                <span className="truncate font-medium">
+                  {user.employee_name}
+                </span>
                 <span className="text-muted-foreground truncate text-xs">
                   {user.email}
                 </span>
@@ -96,10 +93,14 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.img_link} alt={user.employee_name} />
-                  <AvatarFallback className="rounded-lg">{getUserInitials(user.employee_name)}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {getUserInitials(user.employee_name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.employee_name}</span>
+                  <span className="truncate font-medium">
+                    {user.employee_name}
+                  </span>
                   <span className="text-muted-foreground truncate text-xs">
                     {user.email}
                   </span>
@@ -107,9 +108,7 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}
-              variant="destructive"
-            >
+            <DropdownMenuItem onClick={handleLogout} variant="destructive">
               <IconLogout />
               Log out
             </DropdownMenuItem>
@@ -117,5 +116,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

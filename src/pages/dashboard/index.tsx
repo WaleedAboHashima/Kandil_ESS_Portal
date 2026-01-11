@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { YearCalendar } from "@/components/dashboard/year-calendar";
 import { translateLeaveType } from "@/lib/translations";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 // Loading skeleton component for leave balance cards
 function LeaveBalanceCardSkeleton() {
@@ -32,7 +33,9 @@ function LeaveBalanceCardSkeleton() {
 export default function Dashboard() {
   const { data: leaveTypesData, isLoading: leavesLoading } = useLeaveTypes();
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+  const firstName = user?.employee_name?.split(" ")[0] || "User";
 
   // Get all leave balances
   const leaveBalances = useMemo(() => {
@@ -59,13 +62,16 @@ export default function Dashboard() {
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-6 py-4 md:py-6">
           {/* Welcome Header */}
-          <div className="px-4 lg:px-6">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Welcome back, {user?.employee_name?.split(" ")[0] || "User"}!
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              {format(new Date(), "EEEE, MMMM d, yyyy")}
-            </p>
+          <div className="flex items-center gap-2 px-4 lg:px-6">
+            <SidebarTrigger className="-ml-1" />
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold tracking-tight">
+                Welcome back, {firstName}!
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                {format(new Date(), "EEEE, MMMM d, yyyy")}
+              </p>
+            </div>
           </div>
 
           {/* Leave Balances Grid */}
@@ -91,7 +97,7 @@ export default function Dashboard() {
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <CardDescription
-                              className="text-lg font-arabic"
+                              className="text-lg font-almarai"
                               dir="rtl"
                             >
                               {arabicName}
@@ -103,7 +109,7 @@ export default function Dashboard() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-lg text-muted-foreground">
+                          <p className="text-lg text-muted-foreground font-almarai">
                             من {total} أيام
                           </p>
                         </CardContent>

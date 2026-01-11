@@ -5,65 +5,97 @@
 
 /* Outfit Font Family */
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitRegular.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitRegular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitLight1.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitLight1.woff") format("woff");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitExtraLight.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitExtraLight.woff") format("woff");
   font-weight: 200;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitMedium.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitMedium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitSemiBold.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitSemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitBold.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitBold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitExtraBold.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitExtraBold.woff") format("woff");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Outfit';
-  src: url('/src/assets/fonts/OutfitBlack.woff') format('woff');
+  font-family: "Outfit";
+  src: url("/src/assets/fonts/OutfitBlack.woff") format("woff");
   font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Almarai";
+  src: url("/src/assets/fonts/Almarai-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Almarai";
+  src: url("/src/assets/fonts/Almarai-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Almarai";
+  src: url("/src/assets/fonts/Almarai-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Almarai";
+  src: url("/src/assets/fonts/Almarai-Light.ttf") format("truetype");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
@@ -105,16 +137,21 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-aurora: aurora 60s linear infinite;
-  --font-outfit: 'Outfit', 'Outfit Fallback';
+  --font-outfit: "Outfit", "Outfit Fallback";
   --font-sans: var(--font-outfit);
+  --font-almarai: "Almarai", "Almarai Fallback";
 
   @keyframes aurora {
     from {
-      background-position: 50% 50%, 50% 50%;
+      background-position:
+        50% 50%,
+        50% 50%;
     }
 
     to {
-      background-position: 350% 50%, 350% 50%;
+      background-position:
+        350% 50%,
+        350% 50%;
     }
   }
 
@@ -122,7 +159,7 @@
 
   --radius-3xl: calc(var(--radius) + 12px);
 
-  --radius-4xl: calc(var(--radius) + 16px)
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
 :root {
