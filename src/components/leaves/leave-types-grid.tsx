@@ -15,7 +15,6 @@ import {
 } from "@tabler/icons-react";
 import { useLeaveTypes } from "@/queries/leaves";
 import { cn } from "@/lib/utils";
-import { translateLeaveType } from "@/lib/translations";
 
 export function LeaveTypesGrid() {
   const { data: leaveTypesData, isLoading } = useLeaveTypes();
@@ -42,7 +41,6 @@ export function LeaveTypesGrid() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
         {leaveTypesData?.LeavesType.map((leaveType) => {
           const isHourBased = leaveType.request_unit.toLowerCase() === "hour";
-          const leaveTypeLabel = translateLeaveType(leaveType.leave_type_name);
           return (
             <Card
               key={leaveType.leave_type_id}
@@ -73,7 +71,7 @@ export function LeaveTypesGrid() {
                   </Badge>
                 </div>
                 <CardTitle className="text-lg font-semibold leading-tight font-almarai">
-                  {leaveTypeLabel}
+                  {leaveType.leave_type_name}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4 relative">

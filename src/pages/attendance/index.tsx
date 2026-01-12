@@ -43,7 +43,6 @@ import {
   isToday,
   getDay,
 } from "date-fns";
-import { translateLeaveType } from "@/lib/translations";
 
 // Custom weekend checker for Friday (5) and Saturday (6)
 const isWeekend = (date: Date) => {
@@ -347,7 +346,7 @@ export default function Attendance() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardDescription className="text-lg font-almarai">
-                      {translateLeaveType("Present Days")}
+                      Present Days
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       {monthlyStats.presentDays}/{monthlyStats.totalDays}
@@ -366,7 +365,7 @@ export default function Attendance() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardDescription className="text-lg font-almarai">
-                      {translateLeaveType("Absent Days")}
+                      Absent Days
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       {monthlyStats.absentDays}
@@ -383,7 +382,7 @@ export default function Attendance() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardDescription className="text-lg font-almarai">
-                      {translateLeaveType("Total Hours")}
+                      Total Hours
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       {monthlyStats.totalHours}h

@@ -12,7 +12,6 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { YearCalendar } from "@/components/dashboard/year-calendar";
-import { translateLeaveType } from "@/lib/translations";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 // Loading skeleton component for leave balance cards
@@ -88,7 +87,6 @@ export default function Dashboard() {
                   const [used, total] = leave.balance
                     .split("/")
                     .map((v) => v.trim());
-                  const arabicName = translateLeaveType(leave.type);
                   return (
                     <Link key={leave.type} to="/leaves">
                       <Card
@@ -100,7 +98,7 @@ export default function Dashboard() {
                               className="text-lg font-almarai"
                               dir="rtl"
                             >
-                              {arabicName}
+                              {leave.type}
                             </CardDescription>
                             <IconCalendarClock className="size-5 text-primary" />
                           </div>

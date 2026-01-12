@@ -18,6 +18,8 @@ export const leaveTypeTranslations: Record<string, string> = {
   "Extra Hours": "ساعات إضافية",
   "Planned Leave": "اجازه مخطط لها",
   "Casual Leave": "اجازه اعتياديه",
+  "Sick Leave": "اجازه مرضيه",
+  "Unpaid Leaves": "اجازه غير مدفوعه",
 };
 
 export function translateLeaveType(englishName: string): string {
