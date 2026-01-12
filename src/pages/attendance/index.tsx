@@ -21,279 +21,79 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   IconCalendarCheck,
   IconCalendarX,
   IconClock,
   IconClockHour9,
   IconClockHour5,
-  IconMapPin,
+  IconBeach,
+  IconRun,
+  IconFileText,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
-import { useAttendance } from "@/queries/attendance";
+import { useState } from "react";
+import {
+  useAttendanceSummary,
+  useAttendanceStatus,
+} from "@/queries/attendance";
 import {
   format,
   parseISO,
-  differenceInHours,
-  differenceInMinutes,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
   isFuture,
   isToday,
-  getDay,
 } from "date-fns";
 
-// Custom weekend checker for Friday (5) and Saturday (6)
-const isWeekend = (date: Date) => {
-  const day = getDay(date); // 0 = Sunday, 1 = Monday, ..., 5 = Friday, 6 = Saturday
-  return day === 5 || day === 6; // Friday or Saturday
-};
-
 export default function Attendance() {
+  const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(
-    format(new Date(), "yyyy-MM")
+    format(currentDate, "yyyy-MM")
   );
-  const { data: attendanceRecords, isLoading, error } = useAttendance();
 
-  // Calculate monthly statistics
-  const monthlyStats = useMemo(() => {
-    if (!attendanceRecords) return null;
+  const [year, month] = selectedMonth.split("-").map(Number);
 
-    const [year, month] = selectedMonth.split("-").map(Number);
-    const monthStart = startOfMonth(new Date(year, month - 1));
-    const monthEnd = endOfMonth(new Date(year, month - 1));
+  const { data: summaryData, isLoading: isLoadingSummary } =
+    useAttendanceSummary(month, year);
+  const {
+    data: statusData,
+    isLoading: isLoadingStatus,
+    error: statusError,
+  } = useAttendanceStatus(month, year);
 
-    // Filter records for selected month
-    const monthRecords = attendanceRecords.filter((record) => {
-      const checkInDate = parseISO(record.check_in);
-      return checkInDate >= monthStart && checkInDate <= monthEnd;
-    });
-
-    // Calculate total working hours
-    let totalHours = 0;
-    let presentDays = 0;
-
-    monthRecords.forEach((record) => {
-      // Check if both check_in and check_out exist and are not empty strings
-      if (
-        record.check_in &&
-        record.check_out &&
-        record.check_out.trim() !== ""
-      ) {
-        const checkIn = parseISO(record.check_in);
-        const checkOut = parseISO(record.check_out);
-        const hours = differenceInHours(checkOut, checkIn);
-        const minutes = differenceInMinutes(checkOut, checkIn) % 60;
-        totalHours += hours + minutes / 60;
-        presentDays++;
-      } else if (record.check_in) {
-        presentDays++;
-      }
-    });
-
-    // Calculate total days in month (excluding weekends and future days)
-    const allDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-    const workingDays = allDays.filter(
-      (day) => !isWeekend(day) && !isFuture(day)
-    ).length;
-
-    // Calculate absent days (fixed off-by-one error)
-    const absentDays = workingDays - presentDays;
-
-    return {
-      month: format(monthStart, "MMMM yyyy"),
-      totalDays: workingDays,
-      presentDays,
-      absentDays,
-      totalHours: Math.round(totalHours * 10) / 10,
-      attendancePercentage:
-        workingDays > 0
-          ? ((presentDays / workingDays) * 100).toFixed(1)
-          : "0.0",
-    };
-  }, [attendanceRecords, selectedMonth]);
-
-  // Generate full month calendar with all days
-  const displayRecords = useMemo(() => {
-    if (!attendanceRecords) return [];
-
-    const [year, month] = selectedMonth.split("-").map(Number);
-    const monthStart = startOfMonth(new Date(year, month - 1));
-    const monthEnd = endOfMonth(new Date(year, month - 1));
-
-    // Get all days in the month
-    const allDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-    // Create a map of attendance records by date
-    const recordsByDate = new Map();
-    attendanceRecords.forEach((record) => {
-      const checkInDate = parseISO(record.check_in);
-      if (checkInDate >= monthStart && checkInDate <= monthEnd) {
-        const dateKey = format(checkInDate, "yyyy-MM-dd");
-        // If multiple records for same day, keep the one with more hours or the latest
-        const existing = recordsByDate.get(dateKey);
-        if (!existing) {
-          recordsByDate.set(dateKey, record);
-        } else {
-          // Calculate hours for both records
-          const getHours = (rec: typeof record) => {
-            if (rec.check_in && rec.check_out && rec.check_out.trim() !== "") {
-              const checkIn = parseISO(rec.check_in);
-              const checkOut = parseISO(rec.check_out);
-              return differenceInMinutes(checkOut, checkIn);
-            }
-            return 0;
-          };
-          const existingHours = getHours(existing);
-          const currentHours = getHours(record);
-
-          // Keep the record with more hours, or if equal, keep the latest by attendance_id
-          if (
-            currentHours > existingHours ||
-            (currentHours === existingHours &&
-              record.attendance_id > existing.attendance_id)
-          ) {
-            recordsByDate.set(dateKey, record);
-          }
-        }
-      }
-    });
-
-    // Map each day to a display record
-    return allDays.map((day) => {
-      const dateKey = format(day, "yyyy-MM-dd");
-      const record = recordsByDate.get(dateKey);
-      const isFutureDay = isFuture(day) && !isToday(day);
-
-      if (record) {
-        // Day has attendance record
-        const checkInDate = parseISO(record.check_in);
-        // Check if check_out exists and is not an empty string
-        const checkOutDate =
-          record.check_out && record.check_out.trim() !== ""
-            ? parseISO(record.check_out)
-            : null;
-
-        let hours = 0;
-        if (checkOutDate) {
-          const totalMinutes = differenceInMinutes(checkOutDate, checkInDate);
-          hours = Math.round((totalMinutes / 60) * 10) / 10;
-        }
-
-        return {
-          id: record.attendance_id,
-          date: format(day, "MMM d"),
-          fullDate: day,
-          day: format(day, "EEE"),
-          status: checkOutDate ? "present" : "incomplete",
-          checkIn: format(checkInDate, "hh:mm a"),
-          checkOut: checkOutDate ? format(checkOutDate, "hh:mm a") : "-",
-          hours,
-          location:
-            typeof record.partner_name === "string" && record.partner_name
-              ? record.partner_name
-              : "-",
-          hasLocation: record.have_location,
-          isFuture: false,
-          isWeekend: isWeekend(day),
-        };
-      } else if (isFutureDay) {
-        // Future day - not yet happened
-        return {
-          id: `future-${dateKey}`,
-          date: format(day, "MMM d"),
-          fullDate: day,
-          day: format(day, "EEE"),
-          status: "future",
-          checkIn: "-",
-          checkOut: "-",
-          hours: 0,
-          location: "-",
-          hasLocation: false,
-          isFuture: true,
-          isWeekend: isWeekend(day),
-        };
-      } else if (isWeekend(day)) {
-        // Weekend
-        return {
-          id: `weekend-${dateKey}`,
-          date: format(day, "MMM d"),
-          fullDate: day,
-          day: format(day, "EEE"),
-          status: "weekend",
-          checkIn: "-",
-          checkOut: "-",
-          hours: 0,
-          location: "-",
-          hasLocation: false,
-          isFuture: false,
-          isWeekend: true,
-        };
-      } else {
-        // Past working day with no record = absent
-        return {
-          id: `absent-${dateKey}`,
-          date: format(day, "MMM d"),
-          fullDate: day,
-          day: format(day, "EEE"),
-          status: "absent",
-          checkIn: "-",
-          checkOut: "-",
-          hours: 0,
-          location: "-",
-          hasLocation: false,
-          isFuture: false,
-          isWeekend: false,
-        };
-      }
-    });
-  }, [attendanceRecords, selectedMonth]);
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "present":
-        return (
-          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">
-            Complete
-          </Badge>
-        );
-      case "incomplete":
-        return (
-          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
-            In Progress
-          </Badge>
-        );
-      case "absent":
-        return (
-          <Badge className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">
-            Absent
-          </Badge>
-        );
-      case "weekend":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-gray-100 text-gray-700 dark:bg-gray-800/30 dark:text-gray-400"
-          >
-            Weekend
-          </Badge>
-        );
-      case "future":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-slate-50 text-slate-400 hover:bg-slate-50 dark:bg-slate-900/20 dark:text-slate-500"
-          >
-            Not Yet
-          </Badge>
-        );
-      default:
-        return null;
+  const getDayStatusBadge = (details: string) => {
+    if (details.includes("يوم عمل")) {
+      return (
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">
+          Work Day
+        </Badge>
+      );
+    } else if (details.includes("يوم راحه")) {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-gray-100 text-gray-700 dark:bg-gray-800/30 dark:text-gray-400"
+        >
+          Rest Day
+        </Badge>
+      );
+    } else if (details.includes("غياب")) {
+      return (
+        <Badge className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+          Absent
+        </Badge>
+      );
+    } else if (details.includes("Sick Leave")) {
+      return (
+        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400">
+          Sick Leave
+        </Badge>
+      );
+    } else {
+      return <Badge variant="outline">{details}</Badge>;
     }
   };
 
-  if (error) {
+  if (statusError) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Card className="w-full max-w-md">
@@ -309,6 +109,9 @@ export default function Attendance() {
       </div>
     );
   }
+
+  const isLoading = isLoadingSummary || isLoadingStatus;
+  const summary = summaryData?.data?.[0];
 
   return (
     <div className="flex flex-1 flex-col">
@@ -340,172 +143,396 @@ export default function Attendance() {
                 Loading attendance records...
               </div>
             </div>
-          ) : monthlyStats ? (
+          ) : summary ? (
             <>
-              <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardDescription className="text-lg font-almarai">
-                      Present Days
-                    </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
-                      {monthlyStats.presentDays}/{monthlyStats.totalDays}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <IconCalendarCheck className="size-4 text-green-600" />
-                      <span>
-                        {monthlyStats.attendancePercentage}% Attendance
-                      </span>
+              {/* New Summary Cards */}
+              <div className="px-4 lg:px-6">
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-xl">
+                          {summary.month} {summary.year}
+                        </CardTitle>
+                        <CardDescription>
+                          {summaryData?.employee} - {summaryData?.code}
+                        </CardDescription>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardDescription className="text-lg font-almarai">
-                      Absent Days
-                    </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
-                      {monthlyStats.absentDays}
-                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <IconCalendarX className="size-4 text-red-600" />
-                      <span>Unauthorized</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      {/* Target Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconCalendarCheck className="size-4" />
+                          Target Days
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.target_days}
+                        </p>
+                      </div>
 
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardDescription className="text-lg font-almarai">
-                      Total Hours
-                    </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
-                      {monthlyStats.totalHours}h
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <IconClock className="size-4 text-purple-600" />
-                      <span>Expected: {monthlyStats.totalDays * 8}h</span>
+                      {/* Attendance Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconCalendarCheck className="size-4 text-green-600" />
+                          Attendance
+                        </p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {summary.attendance_days}
+                        </p>
+                      </div>
+
+                      {/* Absent Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconCalendarX className="size-4 text-red-600" />
+                          Absent
+                        </p>
+                        <p className="text-2xl font-bold text-red-600">
+                          {summary.absent_days}
+                        </p>
+                      </div>
+
+                      {/* Rest Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconBeach className="size-4 text-blue-600" />
+                          Rest Days
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.rest_days}
+                        </p>
+                      </div>
+
+                      {/* Target Hours */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconClock className="size-4" />
+                          Target
+                        </p>
+                        <p className="text-2xl font-bold">{summary.target}</p>
+                      </div>
+
+                      {/* Actual Hours */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconClock className="size-4 text-purple-600" />
+                          Actual
+                        </p>
+                        <p className="text-2xl font-bold text-purple-600">
+                          {summary.final_actual}
+                        </p>
+                      </div>
+
+                      {/* Overtime Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconClockHour9 className="size-4 text-amber-600" />
+                          Overtime Days
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.overtime_totalday}
+                        </p>
+                      </div>
+
+                      {/* Public Holidays */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconCalendarCheck className="size-4 text-indigo-600" />
+                          Holidays
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.public_holidays}
+                        </p>
+                      </div>
+
+                      {/* Half Days */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconClockHour5 className="size-4" />
+                          Half Days
+                        </p>
+                        <p className="text-2xl font-bold">{summary.half_day}</p>
+                      </div>
+
+                      {/* Missions */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconRun className="size-4" />
+                          Missions
+                        </p>
+                        <p className="text-2xl font-bold">{summary.missions}</p>
+                      </div>
+
+                      {/* Permissions */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconFileText className="size-4" />
+                          Permissions
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.permission}
+                        </p>
+                      </div>
+
+                      {/* Continuous Requests */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <IconFileText className="size-4" />
+                          Cont. Requests
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {summary.continuous_request}
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
+              {/* Tabs for Month and Day Views */}
               <div className="px-4 lg:px-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Attendance Records</CardTitle>
-                    <CardDescription>
-                      Daily attendance details for {monthlyStats.month}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-auto rounded-lg border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Day</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>
-                              <div className="flex items-center gap-2">
-                                <IconClockHour9 className="size-4" />
-                                Check In
-                              </div>
-                            </TableHead>
-                            <TableHead>
-                              <div className="flex items-center gap-2">
-                                <IconClockHour5 className="size-4" />
-                                Check Out
-                              </div>
-                            </TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead className="text-right">Hours</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {displayRecords.map((record) => (
-                            <TableRow
-                              key={record.id}
-                              className={
-                                record.isFuture
-                                  ? "opacity-40 pointer-events-none"
-                                  : ""
-                              }
-                            >
-                              <TableCell
-                                className={`font-medium ${record.isFuture ? "text-muted-foreground" : ""}`}
-                              >
-                                {record.date}
-                              </TableCell>
-                              <TableCell
-                                className={
-                                  record.isFuture ? "text-muted-foreground" : ""
-                                }
-                              >
-                                {record.day}
-                              </TableCell>
-                              <TableCell>
-                                {getStatusBadge(record.status)}
-                              </TableCell>
-                              <TableCell
-                                className={
-                                  record.isFuture ? "text-muted-foreground" : ""
-                                }
-                              >
-                                {record.checkIn}
-                              </TableCell>
-                              <TableCell
-                                className={
-                                  record.isFuture ? "text-muted-foreground" : ""
-                                }
-                              >
-                                {record.checkOut}
-                              </TableCell>
-                              <TableCell>
-                                {record.hasLocation ? (
-                                  <div className="flex items-center gap-1 text-sm">
-                                    <IconMapPin className="size-3 text-blue-600" />
-                                    <span>{record.location}</span>
+                <Tabs defaultValue="day" className="w-full">
+                  <TabsList className="grid w-full max-w-md grid-cols-2">
+                    <TabsTrigger value="day">Today</TabsTrigger>
+                    <TabsTrigger value="month">Month View</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="month" className="mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Monthly Attendance Status</CardTitle>
+                        <CardDescription>
+                          Detailed daily attendance status for{" "}
+                          {format(new Date(year, month - 1), "MMMM yyyy")}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {isLoadingStatus ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-muted-foreground">
+                              Loading status data...
+                            </div>
+                          </div>
+                        ) : statusError ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-red-600">
+                              Error loading status data:{" "}
+                              {(statusError as Error).message ||
+                                "Unknown error"}
+                            </div>
+                          </div>
+                        ) : !statusData?.data ||
+                          statusData.data.length === 0 ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-muted-foreground">
+                              No status data available for this month
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="overflow-auto rounded-lg border">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Date</TableHead>
+                                  <TableHead>Day</TableHead>
+                                  <TableHead>Shift</TableHead>
+                                  <TableHead>In Time</TableHead>
+                                  <TableHead>Out Time</TableHead>
+                                  <TableHead>Late In</TableHead>
+                                  <TableHead>Early In</TableHead>
+                                  <TableHead>Worked Hours</TableHead>
+                                  <TableHead>Overtime</TableHead>
+                                  <TableHead>Status</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {statusData.data.map((day, index) => {
+                                  const dayDate = parseISO(day.date);
+                                  const isFutureDay =
+                                    isFuture(dayDate) && !isToday(dayDate);
+
+                                  return (
+                                    <TableRow
+                                      key={index}
+                                      className={
+                                        isFutureDay
+                                          ? "opacity-40 pointer-events-none"
+                                          : ""
+                                      }
+                                    >
+                                      <TableCell className="font-medium">
+                                        {format(dayDate, "MMM d")}
+                                      </TableCell>
+                                      <TableCell>{day.day}</TableCell>
+                                      <TableCell>{day.shift_id}</TableCell>
+                                      <TableCell>
+                                        {day.in_time !== "00:00"
+                                          ? day.in_time
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {day.out_time !== "00:00"
+                                          ? day.out_time
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {day.late_in !== "00:00"
+                                          ? day.late_in
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {day.early_in !== "00:00"
+                                          ? day.early_in
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {day.worked_hours !== "00:00"
+                                          ? day.worked_hours
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {day.overtime !== "00:00"
+                                          ? day.overtime
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {getDayStatusBadge(day.details)}
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="day" className="mt-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Today's Attendance</CardTitle>
+                        <CardDescription>
+                          Detailed attendance for{" "}
+                          {format(new Date(), "EEEE, MMMM d, yyyy")}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {isLoadingStatus ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-muted-foreground">
+                              Loading today's data...
+                            </div>
+                          </div>
+                        ) : statusError ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-red-600">
+                              Error loading today's data:{" "}
+                              {(statusError as Error).message ||
+                                "Unknown error"}
+                            </div>
+                          </div>
+                        ) : !statusData?.data ||
+                          statusData.data.length === 0 ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-muted-foreground">
+                              No data available for today
+                            </div>
+                          </div>
+                        ) : (
+                          (() => {
+                            const today = format(new Date(), "yyyy-MM-dd");
+                            const todayData = statusData.data.find(
+                              (day) => day.date === today
+                            );
+
+                            if (!todayData) {
+                              return (
+                                <div className="flex items-center justify-center py-8">
+                                  <div className="text-muted-foreground">
+                                    No attendance data for today
                                   </div>
-                                ) : (
-                                  <span className="text-muted-foreground">
-                                    -
-                                  </span>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                {record.hours > 0 ? (
-                                  <span
-                                    className={`${record.hours > 8 ? "text-amber-600 font-semibold" : ""} ${record.isFuture ? "text-muted-foreground" : ""}`}
-                                  >
-                                    {record.hours}h
-                                  </span>
-                                ) : (
-                                  <span
-                                    className={
-                                      record.isFuture
-                                        ? "text-muted-foreground"
-                                        : ""
-                                    }
-                                  >
-                                    -
-                                  </span>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </CardContent>
-                </Card>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div className="overflow-auto rounded-lg border">
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Date</TableHead>
+                                      <TableHead>Day</TableHead>
+                                      <TableHead>Shift</TableHead>
+                                      <TableHead>In Time</TableHead>
+                                      <TableHead>Out Time</TableHead>
+                                      <TableHead>Late In</TableHead>
+                                      <TableHead>Early In</TableHead>
+                                      <TableHead>Worked Hours</TableHead>
+                                      <TableHead>Overtime</TableHead>
+                                      <TableHead>Status</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    <TableRow>
+                                      <TableCell className="font-medium">
+                                        {format(
+                                          parseISO(todayData.date),
+                                          "MMM d"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>{todayData.day}</TableCell>
+                                      <TableCell>
+                                        {todayData.shift_id}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.in_time !== "00:00"
+                                          ? todayData.in_time
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.out_time !== "00:00"
+                                          ? todayData.out_time
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.late_in !== "00:00"
+                                          ? todayData.late_in
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.early_in !== "00:00"
+                                          ? todayData.early_in
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.worked_hours !== "00:00"
+                                          ? todayData.worked_hours
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {todayData.overtime !== "00:00"
+                                          ? todayData.overtime
+                                          : "-"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {getDayStatusBadge(todayData.details)}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            );
+                          })()
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
             </>
           ) : (

@@ -38,11 +38,11 @@ export function YearCalendar({ onDateClick }: YearCalendarProps) {
   const yearStart = startOfYear(new Date(currentYear, 0, 1));
   const yearEnd = endOfYear(new Date(currentYear, 0, 1));
 
-  // Get all leave dates
+  // Get all leave dates with their types
   const leaveDates = useMemo(() => {
-    if (!userLeavesData) return new Set<string>();
+    if (!userLeavesData) return new Map<string, { type: string; status: string }>();
 
-    const dates = new Set<string>();
+    const dates = new Map<string, { type: string; status: string }>();
 
     Object.values(userLeavesData).forEach((categories) => {
       categories.forEach((category) => {
@@ -57,7 +57,12 @@ export function YearCalendar({ onDateClick }: YearCalendarProps) {
               end: endDate,
             });
             datesInRange.forEach((date) => {
-              dates.add(format(date, "yyyy-MM-dd"));
+              const dateStr = format(date, "yyyy-MM-dd");
+              // Store leave type name and status for color coding
+              dates.set(dateStr, {
+                type: leave.leave_type_name,
+                status: leave.status
+              });
             });
           }
         });
@@ -145,7 +150,7 @@ function MonthCalendarSkeleton() {
 
 interface MonthCalendarProps {
   month: Date;
-  leaveDates: Set<string>;
+  leaveDates: Map<string, { type: string; status: string }>;
   onDateClick: (date: Date) => void;
 }
 
@@ -190,10 +195,41 @@ function MonthCalendar({ month, leaveDates, onDateClick }: MonthCalendarProps) {
             ))}
             {days.map((day) => {
               const dateStr = format(day, "yyyy-MM-dd");
-              const isLeaveDay = leaveDates.has(dateStr);
+              const leaveInfo = leaveDates.get(dateStr);
+              const isLeaveDay = !!leaveInfo;
               const isTodayDate = isToday(day);
               const isCurrentMonth = isSameMonth(day, month);
               const isWeekendDay = isWeekend(day);
+
+              // Determine color based on leave type
+              let leaveColorClass = "";
+              if (isLeaveDay && !isTodayDate) {
+                const leaveType = leaveInfo.type.toLowerCase();
+                const leaveStatus = leaveInfo.status.toLowerCase();
+
+                // Different colors based on leave type
+                if (leaveType.includes("sick")) {
+                  leaveColorClass = "bg-red-200 dark:bg-red-900/50 text-red-900 dark:text-red-200";
+                } else if (leaveType.includes("annual") || leaveType.includes("vacation")) {
+                  leaveColorClass = "bg-blue-200 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200";
+                } else if (leaveType.includes("emergency") || leaveType.includes("urgent")) {
+                  leaveColorClass = "bg-orange-200 dark:bg-orange-900/50 text-orange-900 dark:text-orange-200";
+                } else if (leaveType.includes("maternity") || leaveType.includes("paternity")) {
+                  leaveColorClass = "bg-pink-200 dark:bg-pink-900/50 text-pink-900 dark:text-pink-200";
+                } else if (leaveType.includes("unpaid")) {
+                  leaveColorClass = "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300";
+                } else if (leaveType.includes("compensatory") || leaveType.includes("lieu")) {
+                  leaveColorClass = "bg-purple-200 dark:bg-purple-900/50 text-purple-900 dark:text-purple-200";
+                } else {
+                  // Default leave color (green for other types)
+                  leaveColorClass = "bg-green-200 dark:bg-green-900/50 text-green-900 dark:text-green-200";
+                }
+
+                // Add opacity for pending leaves
+                if (leaveStatus.includes("pending") || leaveStatus.includes("draft")) {
+                  leaveColorClass += " opacity-70";
+                }
+              }
 
               return (
                 <button
@@ -207,15 +243,14 @@ function MonthCalendar({ month, leaveDates, onDateClick }: MonthCalendarProps) {
                     !isCurrentMonth && "text-muted-foreground",
                     isTodayDate &&
                       "bg-primary text-primary-foreground font-bold hover:bg-primary/90",
-                    isLeaveDay &&
-                      !isTodayDate &&
-                      "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300",
+                    leaveColorClass,
                     isWeekendDay && "bg-muted/50",
                     !isWeekendDay &&
                       !isLeaveDay &&
                       !isTodayDate &&
                       "hover:ring-2 hover:ring-primary/20"
                   )}
+                  title={isLeaveDay ? `${leaveInfo.type} (${leaveInfo.status})` : undefined}
                 >
                   {format(day, "d")}
                 </button>

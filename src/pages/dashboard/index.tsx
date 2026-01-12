@@ -108,7 +108,7 @@ export default function Dashboard() {
                         </CardHeader>
                         <CardContent>
                           <p className="text-lg text-muted-foreground font-almarai">
-                            من {total} أيام
+                            From {total} days.
                           </p>
                         </CardContent>
                       </Card>
@@ -125,15 +125,45 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold tracking-tight">
                 Leave Calendar {new Date().getFullYear()}
               </h2>
-              <p className="text-muted-foreground text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1 mb-3">
                 Click on any date to request a leave.
-                <span className="inline-flex items-center gap-2 ml-2">
+              </p>
+
+              {/* Color Legend */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <div className="inline-flex items-center gap-2">
                   <span className="inline-block w-3 h-3 rounded bg-primary"></span>
                   <span>Today</span>
-                  <span className="inline-block w-3 h-3 rounded bg-gray-300 dark:bg-gray-700 ml-2"></span>
-                  <span>Requested Leave</span>
-                </span>
-              </p>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-red-200 dark:bg-red-900/50"></span>
+                  <span>Sick Leave</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-blue-200 dark:bg-blue-900/50"></span>
+                  <span>Annual Leave</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-orange-200 dark:bg-orange-900/50"></span>
+                  <span>Emergency Leave</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-pink-200 dark:bg-pink-900/50"></span>
+                  <span>Maternity/Paternity</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-purple-200 dark:bg-purple-900/50"></span>
+                  <span>Compensatory</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-gray-300 dark:bg-gray-700"></span>
+                  <span>Unpaid Leave</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded bg-green-200 dark:bg-green-900/50"></span>
+                  <span>Other</span>
+                </div>
+              </div>
             </div>
             <YearCalendar />
           </div>

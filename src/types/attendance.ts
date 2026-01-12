@@ -36,3 +36,76 @@ export interface AttendanceResponse {
         EnglishMessage: string;
     };
 }
+
+export interface AttendanceSummaryData {
+    month: string;
+    year: string;
+    target_days: number;
+    target: string;
+    final_actual: string;
+    overtime_totalday: number;
+    attendance_days: number;
+    absent_days: number;
+    public_holidays: number;
+    rest_days: number;
+    half_day: number;
+    missions: number;
+    permission: number;
+    continuous_request: number;
+    no_of_months: number;
+    number_of_fridays: number;
+    number_of_public_holidays: number;
+}
+
+export interface AttendanceSummaryResponse {
+    jsonrpc: string;
+    id: null;
+    result: {
+        Code: number;
+        StatusDescription: string;
+        Data: {
+            employee_ar_name: string;
+            employee: string;
+            code: string;
+            "#_lines": number;
+            data: AttendanceSummaryData[];
+        };
+        ArabicMessage: string;
+        EnglishMessage: string;
+    };
+}
+
+export interface AttendanceStatusData {
+    day: string;
+    date: string;
+    in_time: string;
+    out_time: string;
+    shift_id: string;
+    late_in: string;
+    early_in: string;
+    f_in_time: string;
+    f_worked_hours: string;
+    working_hours: string;
+    worked_hours: string;
+    overtime: string;
+    f_overtime: string;
+    details: string;
+}
+
+export interface AttendanceStatusResponse {
+    jsonrpc: string;
+    id: null;
+    result: {
+        Code: number;
+        StatusDescription: string;
+        Data: {
+            employee_ar_name: string;
+            employee: string;
+            code: string;
+            "#_lines": number;
+            data: AttendanceStatusData[];
+        };
+        ArabicMessage: string;
+        EnglishMessage: string;
+    };
+}
