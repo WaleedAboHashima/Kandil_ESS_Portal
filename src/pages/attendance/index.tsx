@@ -301,9 +301,8 @@ export default function Attendance() {
                             {/* Tabs for Month and Day Views */}
                             <div className="px-4 lg:px-6">
                                 <Tabs defaultValue="history" className="w-full">
-                                    <TabsList className="grid w-full max-w-lg grid-cols-3">
+                                    <TabsList className="grid w-full max-w-lg grid-cols-2">
                                         <TabsTrigger value="history">History</TabsTrigger>
-                                        <TabsTrigger value="day">Today</TabsTrigger>
                                         <TabsTrigger value="month">Month View</TabsTrigger>
                                     </TabsList>
 
@@ -493,126 +492,6 @@ export default function Attendance() {
                                         </Card>
                                     </TabsContent>
 
-                                    <TabsContent value="day" className="mt-4">
-                                        <Card>
-                                            <CardHeader>
-                                                <CardTitle>Today's Attendance</CardTitle>
-                                                <CardDescription>
-                                                    Detailed attendance for{" "}
-                                                    {format(new Date(), "EEEE, MMMM d, yyyy")}
-                                                </CardDescription>
-                                            </CardHeader>
-                                            <CardContent>
-                                                {isLoadingStatus ? (
-                                                    <div className="flex items-center justify-center py-8">
-                                                        <div className="text-muted-foreground">
-                                                            Loading today's data...
-                                                        </div>
-                                                    </div>
-                                                ) : statusError ? (
-                                                    <div className="flex items-center justify-center py-8">
-                                                        <div className="text-red-600">
-                                                            Error loading today's data:{" "}
-                                                            {(statusError as Error).message ||
-                                                                "Unknown error"}
-                                                        </div>
-                                                    </div>
-                                                ) : !statusData?.data ||
-                                                    statusData.data.length === 0 ? (
-                                                    <div className="flex items-center justify-center py-8">
-                                                        <div className="text-muted-foreground">
-                                                            No data available for today
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    (() => {
-                                                        const today = format(new Date(), "yyyy-MM-dd");
-                                                        const todayData = statusData.data.find(
-                                                            (day) => day.date === today
-                                                        );
-
-                                                        if (!todayData) {
-                                                            return (
-                                                                <div className="flex items-center justify-center py-8">
-                                                                    <div className="text-muted-foreground">
-                                                                        No attendance data for today
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        }
-
-                                                        return (
-                                                            <div className="overflow-auto rounded-lg border">
-                                                                <Table>
-                                                                    <TableHeader>
-                                                                        <TableRow>
-                                                                            <TableHead>Date</TableHead>
-                                                                            <TableHead>Day</TableHead>
-                                                                            <TableHead>Shift</TableHead>
-                                                                            <TableHead>In Time</TableHead>
-                                                                            <TableHead>Out Time</TableHead>
-                                                                            <TableHead>Late In</TableHead>
-                                                                            <TableHead>Early In</TableHead>
-                                                                            <TableHead>Worked Hours</TableHead>
-                                                                            <TableHead>Overtime</TableHead>
-                                                                            <TableHead>Status</TableHead>
-                                                                        </TableRow>
-                                                                    </TableHeader>
-                                                                    <TableBody>
-                                                                        <TableRow>
-                                                                            <TableCell className="font-medium">
-                                                                                {format(
-                                                                                    parseISO(todayData.date),
-                                                                                    "MMM d"
-                                                                                )}
-                                                                            </TableCell>
-                                                                            <TableCell>{todayData.day}</TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.shift_id}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.in_time !== "00:00"
-                                                                                    ? todayData.in_time
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.out_time !== "00:00"
-                                                                                    ? todayData.out_time
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.late_in !== "00:00"
-                                                                                    ? todayData.late_in
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.early_in !== "00:00"
-                                                                                    ? todayData.early_in
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.worked_hours !== "00:00"
-                                                                                    ? todayData.worked_hours
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {todayData.overtime !== "00:00"
-                                                                                    ? todayData.overtime
-                                                                                    : "-"}
-                                                                            </TableCell>
-                                                                            <TableCell>
-                                                                                {getDayStatusBadge(todayData.details)}
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    </TableBody>
-                                                                </Table>
-                                                            </div>
-                                                        );
-                                                    })()
-                                                )}
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
                                 </Tabs>
                             </div>
                         </>
