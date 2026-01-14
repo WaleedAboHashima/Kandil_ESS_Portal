@@ -9,7 +9,7 @@ import { queryKeys } from "../keys";
 
 
 // Helper to safely store user data in localStorage
-const safeSetUserData = (employee_info: any) => {
+const safeSetUserData = (employee_info: any, tz?: string) => {
     try {
         // Check if localStorage is available
         if (typeof window === 'undefined' || !window.localStorage) {
@@ -23,6 +23,7 @@ const safeSetUserData = (employee_info: any) => {
             email: employee_info.email || '',
             img_link: employee_info.img_link || '',
             employee_id: employee_info.employee_id || null,
+            tz: tz || '',
             // Exclude sensitive fields: employee_pin, phone, mobile, etc.
         };
 
@@ -41,14 +42,14 @@ export const useLoginMutation = () => {
         mutationKey: [queryKeys.auth.user],
         mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
         onSuccess: (data) => {
-            const { token, employee_info } = data.result;
+            const { token, employee_info, context } = data.result;
 
             try {
                 // Store token in cookies (more secure for auth)
                 cookies.set("token", token);
 
                 // Store minimal user data in localStorage
-                safeSetUserData(employee_info);
+                safeSetUserData(employee_info, context?.tz);
 
                 ToastSuccess(`Welcome Back ${employee_info.employee_name || data.result.company_name}`);
                 router.navigate({ to: "/", replace: true });

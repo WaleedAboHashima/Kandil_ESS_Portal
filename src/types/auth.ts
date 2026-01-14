@@ -14,6 +14,7 @@ export interface User {
     approver_Expense: string;
     approver_Time_off: string;
     approver_Timesheet: string;
+    tz?: string;
 }
 
 export interface AuthCallBack {

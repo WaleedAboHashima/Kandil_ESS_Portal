@@ -63,6 +63,20 @@ export default function Attendance() {
 
     const { data: allAttendanceData, isLoading: isLoadingAll } = useAttendance();
 
+    // Get the saved user timezone from session
+    const userTz = (() => {
+        try {
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                return user.tz;
+            }
+        } catch (e) {
+            console.error("Error getting user tz", e);
+        }
+        return undefined;
+    })();
+
     const getDayStatusBadge = (details: string) => {
         if (details.includes("يوم عمل")) {
             return (
@@ -93,6 +107,36 @@ export default function Attendance() {
             );
         } else {
             return <Badge variant="outline">{details}</Badge>;
+        }
+    };
+
+    const formatInTimeZone = (
+        dateStr: string | false | undefined,
+        timeZone: string | false | undefined,
+        type: "date" | "time"
+    ) => {
+        const effectiveTz = timeZone || userTz || "Africa/Cairo";
+        if (!dateStr || !effectiveTz) return "-";
+        try {
+            // Treat the Odoo datetime string (YYYY-MM-DD HH:mm:ss) as UTC
+            const date = new Date(dateStr.replace(" ", "T") + "Z");
+            if (isNaN(date.getTime())) return "-";
+
+            const options: Intl.DateTimeFormatOptions =
+                type === "date"
+                    ? { month: "short", day: "numeric", year: "numeric", timeZone: effectiveTz as string }
+                    : {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                        timeZone: effectiveTz as string,
+                    };
+
+            return new Intl.DateTimeFormat("en-US", options).format(date);
+        } catch (error) {
+            console.error("Timezone formatting error:", error);
+            return dateStr; // Fallback to raw string
         }
     };
 
@@ -340,28 +384,30 @@ export default function Attendance() {
                                                                             key={record.attendance_id}
                                                                         >
                                                                             <TableCell className="font-medium">
-                                                                                {record.check_in
-                                                                                    ? format(
-                                                                                        new Date(record.check_in.replace(' ', 'T')),
-                                                                                        "MMM d, yyyy"
-                                                                                    )
-                                                                                    : "-"}
+                                                                                {formatInTimeZone(
+                                                                                    record.check_in,
+                                                                                    record.employee_tz || userTz,
+                                                                                    "date"
+                                                                                )}
                                                                             </TableCell>
                                                                             <TableCell>
-                                                                                {record.check_in
-                                                                                    ? format(
-                                                                                        new Date(record.check_in.replace(' ', 'T')),
-                                                                                        "HH:mm:ss"
-                                                                                    )
-                                                                                    : "-"}
+                                                                                {formatInTimeZone(
+                                                                                    record.check_in,
+                                                                                    record.employee_tz || userTz,
+                                                                                    "time"
+                                                                                )}
                                                                             </TableCell>
                                                                             <TableCell>
-                                                                                {record.check_out && record.check_out !== record.check_in
-                                                                                    ? format(
-                                                                                        new Date(record.check_out.replace(' ', 'T')),
-                                                                                        "HH:mm:ss"
+                                                                                {record.check_out &&
+                                                                                    record.check_out !==
+                                                                                    record.check_in
+                                                                                    ? formatInTimeZone(
+                                                                                        record.check_out,
+                                                                                        record.employee_tz || userTz,
+                                                                                        "time"
                                                                                     )
-                                                                                    : record.check_out === record.check_in
+                                                                                    : record.check_out ===
+                                                                                        record.check_in
                                                                                         ? "-"
                                                                                         : "Ongoing"}
                                                                             </TableCell>
