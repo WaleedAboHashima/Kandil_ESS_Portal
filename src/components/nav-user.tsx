@@ -18,10 +18,12 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { cookies } from "@/lib/utils";
 import type { User } from "@/types/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Safely parse user from localStorage
   let user: User | null = null;
@@ -44,6 +46,7 @@ export function NavUser() {
   const handleLogout = () => {
     cookies.remove("token");
     localStorage.removeItem("user");
+    queryClient.clear();
     navigate({ to: "/login" });
   };
 
