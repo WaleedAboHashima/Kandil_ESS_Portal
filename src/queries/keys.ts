@@ -14,4 +14,8 @@ export const queryKeys = {
         departments: ['recruitment', 'departments'] as const,
         jobs: ['recruitment', 'jobs'] as const
     },
+    departmentTransfer: {
+        requests: ['departmentTransfer', 'requests'] as const,
+        employees: ['departmentTransfer', 'employees'] as const
+    },
 };

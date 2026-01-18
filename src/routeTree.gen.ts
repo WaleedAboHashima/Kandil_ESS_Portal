@@ -17,6 +17,7 @@ import { Route as AuthenticatedRecruitmentRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPayslipsRouteImport } from './routes/_authenticated/payslips'
 import { Route as AuthenticatedLeavesRouteImport } from './routes/_authenticated/leaves'
+import { Route as AuthenticatedDepartmentTransferRouteImport } from './routes/_authenticated/department-transfer'
 import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated/attendance'
 
 const PublicRoute = PublicRouteImport.update({
@@ -58,6 +59,12 @@ const AuthenticatedLeavesRoute = AuthenticatedLeavesRouteImport.update({
   path: '/leaves',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDepartmentTransferRoute =
+  AuthenticatedDepartmentTransferRouteImport.update({
+    id: '/department-transfer',
+    path: '/department-transfer',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
   id: '/attendance',
   path: '/attendance',
@@ -66,6 +73,7 @@ const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/attendance': typeof AuthenticatedAttendanceRoute
+  '/department-transfer': typeof AuthenticatedDepartmentTransferRoute
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/attendance': typeof AuthenticatedAttendanceRoute
+  '/department-transfer': typeof AuthenticatedDepartmentTransferRoute
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -87,6 +96,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
   '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
+  '/_authenticated/department-transfer': typeof AuthenticatedDepartmentTransferRoute
   '/_authenticated/leaves': typeof AuthenticatedLeavesRoute
   '/_authenticated/payslips': typeof AuthenticatedPayslipsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/attendance'
+    | '/department-transfer'
     | '/leaves'
     | '/payslips'
     | '/profile'
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/attendance'
+    | '/department-transfer'
     | '/leaves'
     | '/payslips'
     | '/profile'
@@ -118,6 +130,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_public'
     | '/_authenticated/attendance'
+    | '/_authenticated/department-transfer'
     | '/_authenticated/leaves'
     | '/_authenticated/payslips'
     | '/_authenticated/profile'
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeavesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/department-transfer': {
+      id: '/_authenticated/department-transfer'
+      path: '/department-transfer'
+      fullPath: '/department-transfer'
+      preLoaderRoute: typeof AuthenticatedDepartmentTransferRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/attendance': {
       id: '/_authenticated/attendance'
       path: '/attendance'
@@ -201,6 +221,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
+  AuthenticatedDepartmentTransferRoute: typeof AuthenticatedDepartmentTransferRoute
   AuthenticatedLeavesRoute: typeof AuthenticatedLeavesRoute
   AuthenticatedPayslipsRoute: typeof AuthenticatedPayslipsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -210,6 +231,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
+  AuthenticatedDepartmentTransferRoute: AuthenticatedDepartmentTransferRoute,
   AuthenticatedLeavesRoute: AuthenticatedLeavesRoute,
   AuthenticatedPayslipsRoute: AuthenticatedPayslipsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,

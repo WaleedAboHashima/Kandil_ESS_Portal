@@ -5,6 +5,7 @@ import {
   IconDashboard,
   IconDoorExit,
   IconUsers,
+  IconTransfer,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -41,6 +42,11 @@ const data = {
       title: "Recruitment",
       url: "/recruitment",
       icon: IconUsers,
+    },
+    {
+      title: "Department Transfer",
+      url: "/department-transfer",
+      icon: IconTransfer,
     },
     {
       title: "Payslips",
