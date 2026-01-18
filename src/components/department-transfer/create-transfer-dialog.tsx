@@ -24,11 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import {
-  IconPlus,
-  IconLoader2,
-  IconCheck,
-} from "@tabler/icons-react";
+import { IconPlus, IconLoader2, IconCheck } from "@tabler/icons-react";
 import {
   useCreateDepartmentTransfer,
   useEmployeeInfo,
@@ -137,7 +133,7 @@ export function CreateTransferDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Department Transfer</DialogTitle>
+          <DialogTitle>Create Employee Transfer Request</DialogTitle>
           <DialogDescription>
             Transfer an employee to a different department and job position.
           </DialogDescription>
