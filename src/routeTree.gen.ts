@@ -13,11 +13,11 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
-import { Route as AuthenticatedRecruitmentRouteImport } from './routes/_authenticated/recruitment'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPayslipsRouteImport } from './routes/_authenticated/payslips'
 import { Route as AuthenticatedLeavesRouteImport } from './routes/_authenticated/leaves'
-import { Route as AuthenticatedDepartmentTransferRouteImport } from './routes/_authenticated/department-transfer'
+import { Route as AuthenticatedHireRequestRouteImport } from './routes/_authenticated/hire-request'
+import { Route as AuthenticatedEmployeeTransferRequestRouteImport } from './routes/_authenticated/employee-transfer-request'
 import { Route as AuthenticatedAttendanceRouteImport } from './routes/_authenticated/attendance'
 
 const PublicRoute = PublicRouteImport.update({
@@ -38,12 +38,6 @@ const PublicLoginRoute = PublicLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => PublicRoute,
 } as any)
-const AuthenticatedRecruitmentRoute =
-  AuthenticatedRecruitmentRouteImport.update({
-    id: '/recruitment',
-    path: '/recruitment',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -59,10 +53,16 @@ const AuthenticatedLeavesRoute = AuthenticatedLeavesRouteImport.update({
   path: '/leaves',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedDepartmentTransferRoute =
-  AuthenticatedDepartmentTransferRouteImport.update({
-    id: '/department-transfer',
-    path: '/department-transfer',
+const AuthenticatedHireRequestRoute =
+  AuthenticatedHireRequestRouteImport.update({
+    id: '/hire-request',
+    path: '/hire-request',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedEmployeeTransferRequestRoute =
+  AuthenticatedEmployeeTransferRequestRouteImport.update({
+    id: '/employee-transfer-request',
+    path: '/employee-transfer-request',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
@@ -73,21 +73,21 @@ const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/attendance': typeof AuthenticatedAttendanceRoute
-  '/department-transfer': typeof AuthenticatedDepartmentTransferRoute
+  '/employee-transfer-request': typeof AuthenticatedEmployeeTransferRequestRoute
+  '/hire-request': typeof AuthenticatedHireRequestRoute
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/recruitment': typeof AuthenticatedRecruitmentRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
   '/attendance': typeof AuthenticatedAttendanceRoute
-  '/department-transfer': typeof AuthenticatedDepartmentTransferRoute
+  '/employee-transfer-request': typeof AuthenticatedEmployeeTransferRequestRoute
+  '/hire-request': typeof AuthenticatedHireRequestRoute
   '/leaves': typeof AuthenticatedLeavesRoute
   '/payslips': typeof AuthenticatedPayslipsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/recruitment': typeof AuthenticatedRecruitmentRoute
   '/login': typeof PublicLoginRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -96,11 +96,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
   '/_authenticated/attendance': typeof AuthenticatedAttendanceRoute
-  '/_authenticated/department-transfer': typeof AuthenticatedDepartmentTransferRoute
+  '/_authenticated/employee-transfer-request': typeof AuthenticatedEmployeeTransferRequestRoute
+  '/_authenticated/hire-request': typeof AuthenticatedHireRequestRoute
   '/_authenticated/leaves': typeof AuthenticatedLeavesRoute
   '/_authenticated/payslips': typeof AuthenticatedPayslipsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/recruitment': typeof AuthenticatedRecruitmentRoute
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
@@ -108,21 +108,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/attendance'
-    | '/department-transfer'
+    | '/employee-transfer-request'
+    | '/hire-request'
     | '/leaves'
     | '/payslips'
     | '/profile'
-    | '/recruitment'
     | '/login'
     | '/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/attendance'
-    | '/department-transfer'
+    | '/employee-transfer-request'
+    | '/hire-request'
     | '/leaves'
     | '/payslips'
     | '/profile'
-    | '/recruitment'
     | '/login'
     | '/'
   id:
@@ -130,11 +130,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_public'
     | '/_authenticated/attendance'
-    | '/_authenticated/department-transfer'
+    | '/_authenticated/employee-transfer-request'
+    | '/_authenticated/hire-request'
     | '/_authenticated/leaves'
     | '/_authenticated/payslips'
     | '/_authenticated/profile'
-    | '/_authenticated/recruitment'
     | '/_public/login'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -174,13 +174,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof PublicRoute
     }
-    '/_authenticated/recruitment': {
-      id: '/_authenticated/recruitment'
-      path: '/recruitment'
-      fullPath: '/recruitment'
-      preLoaderRoute: typeof AuthenticatedRecruitmentRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -202,11 +195,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeavesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/department-transfer': {
-      id: '/_authenticated/department-transfer'
-      path: '/department-transfer'
-      fullPath: '/department-transfer'
-      preLoaderRoute: typeof AuthenticatedDepartmentTransferRouteImport
+    '/_authenticated/hire-request': {
+      id: '/_authenticated/hire-request'
+      path: '/hire-request'
+      fullPath: '/hire-request'
+      preLoaderRoute: typeof AuthenticatedHireRequestRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/employee-transfer-request': {
+      id: '/_authenticated/employee-transfer-request'
+      path: '/employee-transfer-request'
+      fullPath: '/employee-transfer-request'
+      preLoaderRoute: typeof AuthenticatedEmployeeTransferRequestRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/attendance': {
@@ -221,21 +221,22 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
-  AuthenticatedDepartmentTransferRoute: typeof AuthenticatedDepartmentTransferRoute
+  AuthenticatedEmployeeTransferRequestRoute: typeof AuthenticatedEmployeeTransferRequestRoute
+  AuthenticatedHireRequestRoute: typeof AuthenticatedHireRequestRoute
   AuthenticatedLeavesRoute: typeof AuthenticatedLeavesRoute
   AuthenticatedPayslipsRoute: typeof AuthenticatedPayslipsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedRecruitmentRoute: typeof AuthenticatedRecruitmentRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
-  AuthenticatedDepartmentTransferRoute: AuthenticatedDepartmentTransferRoute,
+  AuthenticatedEmployeeTransferRequestRoute:
+    AuthenticatedEmployeeTransferRequestRoute,
+  AuthenticatedHireRequestRoute: AuthenticatedHireRequestRoute,
   AuthenticatedLeavesRoute: AuthenticatedLeavesRoute,
   AuthenticatedPayslipsRoute: AuthenticatedPayslipsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedRecruitmentRoute: AuthenticatedRecruitmentRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

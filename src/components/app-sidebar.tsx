@@ -39,13 +39,13 @@ const data = {
       icon: IconDoorExit,
     },
     {
-      title: "Recruitment",
-      url: "/recruitment",
+      title: "Hire Request",
+      url: "/hire-request",
       icon: IconUsers,
     },
     {
-      title: "Department Transfer",
-      url: "/department-transfer",
+      title: "Employee Transfer Request",
+      url: "/employee-transfer-request",
       icon: IconTransfer,
     },
     {

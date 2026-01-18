@@ -1,6 +1,0 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Recruitment from '@/pages/recruitment'
-
-export const Route = createFileRoute('/_authenticated/recruitment')({
-  component: Recruitment,
-})
