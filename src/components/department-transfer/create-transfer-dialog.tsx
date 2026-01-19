@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +24,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
-import { IconPlus, IconLoader2, IconCheck } from "@tabler/icons-react";
+import { IconPlus, IconLoader2, IconCheck, IconCalendar } from "@tabler/icons-react";
+import type { TransferType } from "@/types/department-transfer";
 import {
   useCreateDepartmentTransfer,
   useEmployeeInfo,
@@ -43,6 +46,11 @@ export function CreateTransferDialog() {
   const [managerNote, setManagerNote] = useState("");
   const [newManagerNote, setNewManagerNote] = useState("");
   const [hrNote, setHrNote] = useState("");
+  const [transferType, setTransferType] = useState<TransferType>("internal");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   const [validationError, setValidationError] = useState<string>("");
 
   const { data: employees } = useEmployeeInfo();
@@ -99,6 +107,16 @@ export function CreateTransferDialog() {
       return;
     }
 
+    if (!startDate) {
+      setValidationError("Please select a start date");
+      return;
+    }
+
+    if (!endDate) {
+      setValidationError("Please select an end date");
+      return;
+    }
+
     const transferData = {
       employee_id: employeeId,
       new_department_id: newDepartmentId,
@@ -106,6 +124,9 @@ export function CreateTransferDialog() {
       manager_note: managerNote || undefined,
       new_manager_note: newManagerNote || undefined,
       hr_note: hrNote || undefined,
+      transfer_type: transferType,
+      start_date: format(startDate, "yyyy-MM-dd"),
+      end_date: format(endDate, "yyyy-MM-dd"),
     };
 
     createTransfer.mutate(transferData, {
@@ -117,6 +138,9 @@ export function CreateTransferDialog() {
         setManagerNote("");
         setNewManagerNote("");
         setHrNote("");
+        setTransferType("internal");
+        setStartDate(undefined);
+        setEndDate(undefined);
         setValidationError("");
         setOpen(false);
       },
@@ -279,6 +303,84 @@ export function CreateTransferDialog() {
                 No jobs available for this department.
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="transfer-type">Transfer Type *</Label>
+            <Select
+              value={transferType}
+              onValueChange={(value: TransferType) => setTransferType(value)}
+              required
+            >
+              <SelectTrigger id="transfer-type">
+                <SelectValue placeholder="Select transfer type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="internal">Internal</SelectItem>
+                <SelectItem value="acting">Acting</SelectItem>
+                <SelectItem value="temporary">Temporary</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Start Date *</Label>
+              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground",
+                    )}
+                  >
+                    <IconCalendar className="mr-2 size-4" />
+                    {startDate ? format(startDate, "PPP") : "Select start date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => {
+                      setStartDate(date);
+                      setStartDateOpen(false);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label>End Date *</Label>
+              <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground",
+                    )}
+                  >
+                    <IconCalendar className="mr-2 size-4" />
+                    {endDate ? format(endDate, "PPP") : "Select end date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={(date) => {
+                      setEndDate(date);
+                      setEndDateOpen(false);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
 
           <div className="space-y-2">

@@ -17,6 +17,8 @@ export interface GetEmployeeInfoResponse {
   };
 }
 
+export type TransferType = "internal" | "acting" | "temporary";
+
 export interface CreateDepartmentTransferRequest {
   employee_id: number;
   new_department_id: number;
@@ -24,6 +26,9 @@ export interface CreateDepartmentTransferRequest {
   manager_note?: string;
   new_manager_note?: string;
   hr_note?: string;
+  transfer_type: TransferType;
+  start_date: string;
+  end_date: string;
 }
 
 export interface CreateDepartmentTransferResponse {
